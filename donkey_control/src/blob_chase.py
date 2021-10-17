@@ -26,7 +26,7 @@ class PCA9685:
     """
 
     def __init__(
-           self, channel, address, frequency=60, busnum=None, init_delay=0.1
+           self, channel, address, frequency=1024, busnum=None, init_delay=0.1
     ):
 
         self.default_freq = 60
@@ -70,7 +70,7 @@ class PCA9685:
 
 class PWMThrottle:
     """
-    Wrapper over a PWM motor cotroller to convert -1 to 1 throttle
+    Wrapper over a PWM motor controller to convert -1 to 1 throttle
     values to PWM pulses.
     """
     MIN_THROTTLE = -1
@@ -105,22 +105,22 @@ class PWMThrottle:
         right_pulse = int(right_motor_speed) 
 
         if left_motor_speed > 0:
-            self.controller.pwm.set_pwm(self.controller.channel+ 8,0,left_pulse)
-            self.controller.pwm.set_pwm(self.controller.channel+10,0,0)
-            self.controller.pwm.set_pwm(self.controller.channel+ 9,0,4095)
+            self.controller.pwm.set_pwm(self.controller.channel+0,0,left_pulse)     #PWM
+            self.controller.pwm.set_pwm(self.controller.channel+1,0,0)              #DIR
+            self.controller.pwm.set_pwm(self.controller.channel+2,0,0)              #BRK
         else:
-            self.controller.pwm.set_pwm(self.controller.channel+ 8,0,-left_pulse)
-            self.controller.pwm.set_pwm(self.controller.channel+ 9,0,0)
-            self.controller.pwm.set_pwm(self.controller.channel+10,0,4095)           
+            self.controller.pwm.set_pwm(self.controller.channel+0,0,-left_pulse)
+            self.controller.pwm.set_pwm(self.controller.channel+1,0,4095)
+            self.controller.pwm.set_pwm(self.controller.channel+2,0,0)           
 
         if right_motor_speed > 0:
-            self.controller.pwm.set_pwm(self.controller.channel+13,0,right_pulse)
-            self.controller.pwm.set_pwm(self.controller.channel+11,0,0) 
-            self.controller.pwm.set_pwm(self.controller.channel+12,0,4095)
+            self.controller.pwm.set_pwm(self.controller.channel+4,0,right_pulse)    #PWM
+            self.controller.pwm.set_pwm(self.controller.channel+5,0,0)              #DIR 
+            self.controller.pwm.set_pwm(self.controller.channel+6,0,0)              #BRK
         else:
-            self.controller.pwm.set_pwm(self.controller.channel+13,0,-right_pulse)
-            self.controller.pwm.set_pwm(self.controller.channel+12,0,0) 
-            self.controller.pwm.set_pwm(self.controller.channel+11,0,4095)
+            self.controller.pwm.set_pwm(self.controller.channel+4,0,-right_pulse)
+            self.controller.pwm.set_pwm(self.controller.channel+5,0,4095) 
+            self.controller.pwm.set_pwm(self.controller.channel+6,0,0)
 
     def shutdown(self):
         self.run(0) #stop vehicle
@@ -161,7 +161,7 @@ class DkLowLevelCtrl:
         # --- Initialize the node
         rospy.init_node("blob_chase_node")
 
-        throttle_controller = PCA9685(channel=0, address=0x60, busnum=1)
+        throttle_controller = PCA9685(channel=0, address=0x40, busnum=1)
         self._throttle = PWMThrottle(controller=throttle_controller, max_pulse=4095, zero_pulse=0, min_pulse=-4095)
         rospy.loginfo("Throttle Controler Awaked!!")
 
